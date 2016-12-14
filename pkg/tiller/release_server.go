@@ -31,6 +31,8 @@ import (
 	"k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
 	"k8s.io/kubernetes/pkg/client/typed/discovery"
 
+	"github.com/Mirantis/k8s-appcontroller/cmd/format"
+
 	"k8s.io/helm/pkg/chartutil"
 	"k8s.io/helm/pkg/kube"
 	"k8s.io/helm/pkg/proto/hapi/chart"
@@ -582,6 +584,8 @@ func (s *ReleaseServer) InstallRelease(c ctx.Context, req *services.InstallRelea
 		return res, err
 	}
 
+	//log.Printf(rel.Manifest)
+
 	res, err := s.performRelease(rel, req)
 	if err != nil {
 		log.Printf("Failed install perform step: %s", err)
@@ -732,10 +736,30 @@ func (s *ReleaseServer) renderResources(ch *chart.Chart, values chartutil.Values
 	b := bytes.NewBuffer(nil)
 	for _, m := range manifests {
 		b.WriteString("\n---\n# Source: " + m.name + "\n")
-		b.WriteString(m.content)
+		log.Printf("Trying to wrap %s", m.name)
+		wrapped, err := format.Yaml{}.Wrap(getInput(m.content, 2))
+		if err != nil {
+			log.Printf("didn't wrap %s: %s", m.name, err)
+			b.WriteString(m.content)
+			log.Println(getInput(m.content, 2))
+		}
+		log.Printf("wrapped %s", m.name)
+
+		b.WriteString(wrapped)
 	}
 
+	//log.Println(b.String())
+
 	return hooks, b, notes, nil
+}
+
+func getInput(in string, indent int) string {
+	spaces := strings.Repeat(" ", indent)
+
+	result := spaces + strings.Replace(in, "\n", "\n"+spaces, -1)
+
+	return result
+
 }
 
 func (s *ReleaseServer) recordRelease(r *release.Release, reuse bool) {
@@ -763,6 +787,7 @@ func (s *ReleaseServer) performRelease(r *release.Release, req *services.Install
 			return res, err
 		}
 	}
+	log.Printf("release name: %s", req.Name)
 
 	switch h, err := s.env.Releases.History(req.Name); {
 	// if this is a replace operation, append to the release history

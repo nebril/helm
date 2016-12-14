@@ -187,6 +187,10 @@ imports:
   version: d6bea18f789704b5f83375793155289da36a3c7f
 - name: github.com/mitchellh/go-wordwrap
   version: ad45545899c7b13c020ea92b2072220eefad42b8
+- name: github.com/Mirantis/k8s-appcontroller
+  version: 65c6ca6dc3e63ab51ee9ef88585140c28b2d67f7
+  subpackages:
+  - cmd/format
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/PuerkitoBio/purell
@@ -289,6 +293,74 @@ imports:
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
   version: a83829b6f1293c91addabc89d0571c246397bbf4
+- name: k8s.io/client-go
+  version: 3a5b96cfd3d3ff1d53d979b4297c4f3b869aab09
+  subpackages:
+  - 1.4/pkg/api
+  - 1.4/pkg/api/endpoints
+  - 1.4/pkg/api/errors
+  - 1.4/pkg/api/meta
+  - 1.4/pkg/api/meta/metatypes
+  - 1.4/pkg/api/pod
+  - 1.4/pkg/api/resource
+  - 1.4/pkg/api/service
+  - 1.4/pkg/api/unversioned
+  - 1.4/pkg/api/unversioned/validation
+  - 1.4/pkg/api/util
+  - 1.4/pkg/api/v1
+  - 1.4/pkg/api/validation
+  - 1.4/pkg/apimachinery
+  - 1.4/pkg/apimachinery/registered
+  - 1.4/pkg/apis/autoscaling
+  - 1.4/pkg/apis/batch
+  - 1.4/pkg/apis/extensions
+  - 1.4/pkg/auth/user
+  - 1.4/pkg/capabilities
+  - 1.4/pkg/conversion
+  - 1.4/pkg/conversion/queryparams
+  - 1.4/pkg/fields
+  - 1.4/pkg/labels
+  - 1.4/pkg/runtime
+  - 1.4/pkg/runtime/serializer
+  - 1.4/pkg/runtime/serializer/json
+  - 1.4/pkg/runtime/serializer/protobuf
+  - 1.4/pkg/runtime/serializer/recognizer
+  - 1.4/pkg/runtime/serializer/streaming
+  - 1.4/pkg/runtime/serializer/versioning
+  - 1.4/pkg/security/apparmor
+  - 1.4/pkg/selection
+  - 1.4/pkg/third_party/forked/golang/reflect
+  - 1.4/pkg/types
+  - 1.4/pkg/util
+  - 1.4/pkg/util/clock
+  - 1.4/pkg/util/config
+  - 1.4/pkg/util/crypto
+  - 1.4/pkg/util/errors
+  - 1.4/pkg/util/flowcontrol
+  - 1.4/pkg/util/framer
+  - 1.4/pkg/util/hash
+  - 1.4/pkg/util/integer
+  - 1.4/pkg/util/intstr
+  - 1.4/pkg/util/json
+  - 1.4/pkg/util/labels
+  - 1.4/pkg/util/net
+  - 1.4/pkg/util/net/sets
+  - 1.4/pkg/util/parsers
+  - 1.4/pkg/util/rand
+  - 1.4/pkg/util/runtime
+  - 1.4/pkg/util/sets
+  - 1.4/pkg/util/uuid
+  - 1.4/pkg/util/validation
+  - 1.4/pkg/util/validation/field
+  - 1.4/pkg/util/wait
+  - 1.4/pkg/util/yaml
+  - 1.4/pkg/version
+  - 1.4/pkg/watch
+  - 1.4/pkg/watch/versioned
+  - 1.4/rest
+  - 1.4/tools/clientcmd/api
+  - 1.4/tools/metrics
+  - 1.4/transport
 - name: k8s.io/kubernetes
   version: 5f332aab13e58173f85fd204a2c77731f7a2573f
   subpackages:
