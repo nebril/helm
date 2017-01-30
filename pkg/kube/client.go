@@ -42,8 +42,82 @@ import (
 	"k8s.io/kubernetes/pkg/runtime"
 	"k8s.io/kubernetes/pkg/util/strategicpatch"
 	"k8s.io/kubernetes/pkg/watch"
+	//"k8s.io/kubernetes/pkg/api/unversioned"
+	//"k8s.io/kubernetes/pkg/apimachinery/announced"
+	//batchv1 "k8s.io/kubernetes/pkg/apis/batch/v1"
 )
 
+/*
+const (
+	GroupName string = "appcontroller.k8s"
+	Version   string = "v1alpha1"
+)
+
+var (
+	SchemeGroupVersion = unversioned.GroupVersion{Group: GroupName, Version: Version}
+	SchemeBuilder      = runtime.NewSchemeBuilder(addKnownTypes)
+)
+
+func addKnownTypes(scheme *runtime.Scheme) error {
+	definitionGVK := SchemeGroupVersion.WithKind("Definition")
+	scheme.AddKnownTypeWithName(
+		definitionGVK,
+		&ResourceDefinition{},
+	)
+	scheme.AddKnownTypes(
+		SchemeGroupVersion,
+		&Dependency{},
+	)
+	return nil
+}
+
+func init() {
+	if err := announced.NewGroupMetaFactory(
+		&announced.GroupMetaFactoryArgs{
+			GroupName:                  GroupName,
+			VersionPreferenceOrder:     []string{SchemeGroupVersion.Version},
+			AddInternalObjectsToScheme: SchemeBuilder.AddToScheme,
+		},
+		announced.VersionToSchemeFunc{
+			SchemeGroupVersion.Version: SchemeBuilder.AddToScheme,
+		},
+	).Announce().RegisterAndEnable(); err != nil {
+		panic(err)
+	}
+}
+
+type ResourceDefinition struct {
+	unversioned.TypeMeta `json:",inline"`
+
+	// Standard object metadata
+	api.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+
+	Meta map[string]string `json:"meta,omitempty"`
+
+	//TODO: add other object types
+	Pod                   *v1.Pod                   `json:"pod,omitempty"`
+	Job                   *batchv1.Job              `json:"job,omitempty"`
+	Service               *v1.Service               `json:"service,omitempty"`
+	ReplicaSet            *v1beta1.ReplicaSet       `json:"replicaset,omitempty"`
+	StatefulSet           *apps.StatefulSet         `json:"statefulset,omitempty"`
+	DaemonSet             *v1beta1.DaemonSet        `json:"daemonset,omitempty"`
+	ConfigMap             *v1.ConfigMap             `json:"configmap,omitempty"`
+	Secret                *v1.Secret                `json:"secret,omitempty"`
+	Deployment            *v1beta1.Deployment       `json:"deployment, omitempty"`
+	PersistentVolumeClaim *v1.PersistentVolumeClaim `json:"persistentvolumeclaim, omitempty"`
+}
+
+type Dependency struct {
+	unversioned.TypeMeta `json:",inline"`
+
+	// Standard object metadata
+	api.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+
+	Parent string            `json:"parent"`
+	Child  string            `json:"child"`
+	Meta   map[string]string `json:"meta,omitempty"`
+}
+*/
 // ErrNoObjectsVisited indicates that during a visit operation, no matching objects were found.
 var ErrNoObjectsVisited = goerrors.New("no objects visited")
 
@@ -89,13 +163,13 @@ func (c *Client) Create(namespace string, reader io.Reader) error {
 }
 
 func (c *Client) newBuilder(namespace string, reader io.Reader) *resource.Result {
-	schema, err := c.Validator(true, c.SchemaCacheDir)
-	if err != nil {
+	//schema, err := c.Validator(true, c.SchemaCacheDir)
+	/*if err != nil {
 		log.Printf("warning: failed to load schema: %s", err)
-	}
+	}*/
 	return c.NewBuilder().
 		ContinueOnError().
-		Schema(schema).
+		//Schema(schema).
 		NamespaceParam(namespace).
 		DefaultNamespace().
 		Stream(reader, "").

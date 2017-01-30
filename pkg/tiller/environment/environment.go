@@ -23,6 +23,7 @@ These dependencies are expressed as interfaces so that alternate implementations
 package environment
 
 import (
+	"fmt"
 	"io"
 
 	"k8s.io/helm/pkg/chartutil"
@@ -32,6 +33,17 @@ import (
 	"k8s.io/helm/pkg/storage"
 	"k8s.io/helm/pkg/storage/driver"
 	"k8s.io/kubernetes/pkg/kubectl/resource"
+
+	"github.com/spf13/pflag"
+	"k8s.io/kubernetes/pkg/api"
+	"k8s.io/kubernetes/pkg/api/unversioned"
+	"k8s.io/kubernetes/pkg/apimachinery/announced"
+	"k8s.io/kubernetes/pkg/client/restclient"
+	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
+	//cmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
+	"k8s.io/kubernetes/pkg/runtime"
+	"k8s.io/kubernetes/pkg/runtime/serializer"
+	utilflag "k8s.io/kubernetes/pkg/util/flag"
 )
 
 // DefaultTillerNamespace is the default namespace for tiller.
@@ -192,6 +204,76 @@ type Environment struct {
 	KubeClient KubeClient
 }
 
+func addKnownTypes(scheme *runtime.Scheme) error {
+	scheme.AddKnownTypes(
+		SchemeGroupVersion,
+		&Dependency{},
+		&DependencyList{},
+		&api.ListOptions{},
+		&api.DeleteOptions{},
+	)
+	return nil
+}
+
+func init() {
+	if err := announced.NewGroupMetaFactory(
+		&announced.GroupMetaFactoryArgs{
+			GroupName:                  GroupName,
+			VersionPreferenceOrder:     []string{SchemeGroupVersion.Version},
+			AddInternalObjectsToScheme: SchemeBuilder.AddToScheme,
+		},
+		announced.VersionToSchemeFunc{
+			SchemeGroupVersion.Version: SchemeBuilder.AddToScheme,
+		},
+	).Announce().RegisterAndEnable(); err != nil {
+		panic(err)
+	}
+}
+
+type Dependency struct {
+	unversioned.TypeMeta `json:",inline"`
+
+	// Standard object metadata
+	api.ObjectMeta `json:"metadata,omitempty"`
+
+	Parent string            `json:"parent"`
+	Child  string            `json:"child"`
+	Meta   map[string]string `json:"meta,omitempty"`
+}
+
+type DependencyList struct {
+	unversioned.TypeMeta `json:",inline"`
+	Metadata             unversioned.ListMeta `json:"metadata"`
+
+	Items []Dependency `json:"items"`
+}
+
+type Cc clientcmd.ClientConfig
+
+type HelmClientConfig struct {
+	Cc
+}
+
+func (config *HelmClientConfig) ClientConfig() (*restclient.Config, error) {
+
+	c, err := config.Cc.ClientConfig()
+	if err != nil {
+		return c, err
+	}
+	configureClient(c)
+	return c, err
+}
+
+func configureClient(config *restclient.Config) {
+	fmt.Println("configuring client")
+	config.GroupVersion = &SchemeGroupVersion
+	config.APIPath = "/apis"
+	config.ContentType = runtime.ContentTypeJSON
+	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: api.Codecs}
+}
+
+var _ clientcmd.ClientConfig = &HelmClientConfig{}
+
 // New returns an environment initialized with the defaults.
 func New() *Environment {
 	e := engine.New()
@@ -200,6 +282,12 @@ func New() *Environment {
 		// we can easily add some here.
 		GoTplEngine: e,
 	}
+
+	flags := pflag.NewFlagSet("", pflag.ContinueOnError)
+	flags.SetNormalizeFunc(utilflag.WarnWordSepNormalizeFunc) // Warn for "_" flags
+	//config := &HelmClientConfig{
+	//	Cc: cmdutil.DefaultClientConfig(flags),
+	//}
 
 	return &Environment{
 		EngineYard: ey,
