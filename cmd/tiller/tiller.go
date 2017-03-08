@@ -69,11 +69,12 @@ var rootServer *grpc.Server
 var env = environment.New()
 
 var (
-	grpcAddr      = ":44134"
-	probeAddr     = ":44135"
-	traceAddr     = ":44136"
-	enableTracing = false
-	store         = storageConfigMap
+	grpcAddr             = ":44134"
+	probeAddr            = ":44135"
+	traceAddr            = ":44136"
+	enableTracing        = false
+	store                = storageConfigMap
+	remoteReleaseModules = false
 )
 
 var (
@@ -107,6 +108,7 @@ func main() {
 	p.StringVarP(&grpcAddr, "listen", "l", ":44134", "address:port to listen on")
 	p.StringVar(&store, "storage", storageConfigMap, "storage driver to use. One of 'configmap' or 'memory'")
 	p.BoolVar(&enableTracing, "trace", false, "enable rpc tracing")
+	p.BoolVar(&remoteReleaseModules, "experimental-release", false, "enable experimental release modules")
 
 	p.BoolVar(&tlsEnable, "tls", tlsEnableEnvVarDefault(), "enable TLS")
 	p.BoolVar(&tlsVerify, "tls-verify", tlsVerifyEnvVarDefault(), "enable TLS and verify remote certificate")
@@ -172,7 +174,7 @@ func start(c *cobra.Command, args []string) {
 	srvErrCh := make(chan error)
 	probeErrCh := make(chan error)
 	go func() {
-		svc := tiller.NewReleaseServer(env, clientset)
+		svc := tiller.NewReleaseServer(env, clientset, remoteReleaseModules)
 		services.RegisterReleaseServiceServer(rootServer, svc)
 		if err := rootServer.Serve(lstn); err != nil {
 			srvErrCh <- err
