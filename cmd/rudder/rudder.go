@@ -26,9 +26,9 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
 
+	rudderAPI "github.com/nebril/helm/pkg/proto/hapi/rudder"
+	"github.com/nebril/helm/pkg/rudder"
 	"k8s.io/helm/pkg/kube"
-	rudderAPI "k8s.io/helm/pkg/proto/hapi/rudder"
-	"k8s.io/helm/pkg/rudder"
 	"k8s.io/helm/pkg/tiller"
 	"k8s.io/helm/pkg/version"
 )

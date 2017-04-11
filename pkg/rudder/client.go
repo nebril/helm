@@ -22,7 +22,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	rudderAPI "k8s.io/helm/pkg/proto/hapi/rudder"
+	rudderAPI "github.com/nebril/helm/pkg/proto/hapi/rudder"
 )
 
 // GrpcPort specifies port on which rudder will spawn a server

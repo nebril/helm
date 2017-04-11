@@ -24,13 +24,13 @@ import (
 
 	"k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset"
 
+	rudderAPI "github.com/nebril/helm/pkg/proto/hapi/rudder"
+	"github.com/nebril/helm/pkg/rudder"
 	"k8s.io/helm/pkg/chartutil"
 	"k8s.io/helm/pkg/kube"
 	"k8s.io/helm/pkg/proto/hapi/release"
-	rudderAPI "k8s.io/helm/pkg/proto/hapi/rudder"
 	"k8s.io/helm/pkg/proto/hapi/services"
 	relutil "k8s.io/helm/pkg/releaseutil"
-	"k8s.io/helm/pkg/rudder"
 	"k8s.io/helm/pkg/tiller/environment"
 )
 
