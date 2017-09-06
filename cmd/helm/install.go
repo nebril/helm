@@ -118,6 +118,7 @@ type installCmd struct {
 	wait         bool
 	repoURL      string
 	devel        bool
+	existingDeps []string
 
 	certFile string
 	keyFile  string
@@ -193,6 +194,7 @@ func newInstallCmd(c helm.Interface, out io.Writer) *cobra.Command {
 	f.StringVar(&inst.keyFile, "key-file", "", "identify HTTPS client using this SSL key file")
 	f.StringVar(&inst.caFile, "ca-file", "", "verify certificates of HTTPS-enabled servers using this CA bundle")
 	f.BoolVar(&inst.devel, "devel", false, "use development versions, too. Equivalent to version '>0.0.0-a'. If --version is set, this is ignored.")
+	f.StringArrayVar(&inst.existingDeps, "existing-dependencies", []string{}, "use existing releases as dependencies for installed chart.")
 
 	return cmd
 }
@@ -245,7 +247,8 @@ func (i *installCmd) run() error {
 		helm.InstallReuseName(i.replace),
 		helm.InstallDisableHooks(i.disableHooks),
 		helm.InstallTimeout(i.timeout),
-		helm.InstallWait(i.wait))
+		helm.InstallWait(i.wait),
+		helm.InstallReleasedDeps(i.existingDeps))
 	if err != nil {
 		return prettyError(err)
 	}

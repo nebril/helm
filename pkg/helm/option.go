@@ -18,6 +18,7 @@ package helm
 
 import (
 	"crypto/tls"
+	"strings"
 
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/context"
@@ -78,6 +79,8 @@ type options struct {
 	reuseValues bool
 	// release test options are applied directly to the test release history request
 	testReq rls.TestReleaseRequest
+	// releasedDeps instructs Tiller to not create subcharts which have specified deployed release
+	releasedDeps []*cpb.ReusedSubchart
 }
 
 // Host specifies the host address of the Tiller release server, (default = ":44134").
@@ -226,6 +229,22 @@ func RollbackTimeout(timeout int64) RollbackOption {
 func InstallWait(wait bool) InstallOption {
 	return func(opts *options) {
 		opts.instReq.Wait = wait
+	}
+}
+
+//InstallReleasedDeps specifies which subcharts should be taken from already released releases
+func InstallReleasedDeps(deps []string) InstallOption {
+	return func(opts *options) {
+		parsedDeps := make([]*cpb.ReusedSubchart, 0, len(deps))
+		for _, dep := range deps {
+			parts := strings.Split(dep, "=")
+			d := &cpb.ReusedSubchart{
+				SubchartPath: parts[0],
+				ReleaseName:  parts[1],
+			}
+			parsedDeps = append(parsedDeps, d)
+		}
+		opts.releasedDeps = parsedDeps
 	}
 }
 
