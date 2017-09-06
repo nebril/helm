@@ -18,6 +18,7 @@ package hapi.services.tiller;
 
 import "hapi/chart/chart.proto";
 import "hapi/chart/config.proto";
+import "hapi/chart/subcharts_reuse.proto";
 import "hapi/release/release.proto";
 import "hapi/release/info.proto";
 import "hapi/release/test_run.proto";
@@ -271,6 +272,9 @@ message InstallReleaseRequest {
 	// wait, if true, will wait until all Pods, PVCs, and Services are in a ready state
 	// before marking the release as successful. It will wait for as long as timeout
 	bool wait = 9;
+
+    // reused_subcharts specify which subcharts should use existing releases to satisfy subchart dependency
+    repeated hapi.chart.ReusedSubchart reused_subcharts = 10;
 }
 
 // InstallReleaseResponse is the response from a release installation.
